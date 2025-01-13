@@ -1,0 +1,139 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  discordId    String   @unique
+  discordTag   String
+  kickUsername String
+  points       Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Admin {
+  id       Int      @id @default(autoincrement())
+  username String   @unique
+  password String
+  createdAt DateTime @default(now())
+}
+
+model Raffle {
+  id              Int       @id @default(autoincrement())
+  title           String
+  costToEnter     Int       @default(0)
+  maxParticipants Int       @default(100)
+  numWinners      Int       @default(1)
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  participants    RaffleParticipant[]
+}
+
+model RaffleParticipant {
+  id        Int    @id @default(autoincrement())
+  userId    Int
+  raffleId  Int
+  joinedAt  DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  raffle Raffle @relation(fields: [raffleId], references: [id])
+}
+
+model Giveaway {
+  id              Int      @id @default(autoincrement())
+  title           String
+  costToEnter     Int      @default(0)
+  maxParticipants Int      @default(100)
+  numWinners      Int      @default(1)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  participants    GiveawayParticipant[]
+}
+
+model GiveawayParticipant {
+  id         Int       @id @default(autoincrement())
+  userId     Int
+  giveawayId Int
+  joinedAt   DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id])
+  giveaway Giveaway @relation(fields: [giveawayId], references: [id])
+}
+
+model BonusBuy {
+  id             Int       @id @default(autoincrement())
+  startBalance   Int
+  endBalance     Int?
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  predictions    Prediction[]
+}
+
+model Prediction {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  bonusBuyId Int
+  guess      Int
+  createdAt  DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id])
+  bonusBuy BonusBuy @relation(fields: [bonusBuyId], references: [id])
+}
+
+model BonusCode {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  points    Int      @default(0)
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+}
+
+model BonusCodeRedemption {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  bonusCodeId Int
+  redeemedAt  DateTime   @default(now())
+
+  user      User      @relation(fields: [userId], references: [id])
+  bonusCode BonusCode @relation(fields: [bonusCodeId], references: [id])
+}
+
+model VPN {
+  id          Int      @id @default(autoincrement())
+  name        String
+  logoUrl     String
+  downloadUrl String
+  createdAt   DateTime @default(now())
+}
+
+model Schedule {
+  id        Int       @id @default(autoincrement())
+  streamDate DateTime
+  title     String
+  createdAt DateTime   @default(now())
+}
+
+model Media {
+  id         Int       @id @default(autoincrement())
+  title      String
+  mediaUrl   String
+  createdAt  DateTime  @default(now())
+}
+
+model WagerRace {
+  id         Int       @id @default(autoincrement())
+  title      String
+  details    String
+  updatedAt  DateTime  @default(now())
+}
